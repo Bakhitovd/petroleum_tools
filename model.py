@@ -1,9 +1,16 @@
 import csv
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta, date
-db = SQLAlchemy()
+#db = SQLAlchemy()
+#from sqlalchemy import create_engine, Table, Column, Integer, String, Float, Boolean, Numeric, ForeignKey
+import sqlalchemy as db
+from sqlalchemy.orm import sessionmaker, scoped_session, relationship
+from sqlalchemy.ext.declarative import declarative_base
 
-class WellsStartDates(db.Model):
+Base = declarative_base()
+
+class WellsStartDates(Base):
+    __tablename__ = 'WellsStartDates'
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -16,7 +23,8 @@ class WellsStartDates(db.Model):
         плаcт: {self.form}, дата запуска по фонду: {self.start_date}'
 
 
-class WellMonthRates(db.Model):
+class WellMonthRates(Base):  #Добавить 
+    __tablename__ = 'WellMonthRates'
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -26,13 +34,28 @@ class WellMonthRates(db.Model):
     water = db.Column(db.Float, nullable=True)
     injection = db.Column(db.Float, nullable=True)
     work_time = db.Column(db.Float, nullable=True)
+    
+    def __init__(self,well_id, name, date, oil, gas, water, injection, work_time):
+        self.well_id = well_id.strip()
+        self.name = name.strip()
+        try:
+            self.date = date.strip()
+            self.date = datetime.strptime(date, '%Y%m%d')
+        except:
+            self.date=date          
+        self.oil = float(oil)
+        self.gas = float(gas)
+        self.water = float(water)
+        self.injection = float(injection)
+        self.work_time = float(work_time)
 
     def __repr__(self):
         return (f'Cкважина: {self.name}, дата: {self.date}, нефть т/мес: {self.oil},\
         газ м3/мес: {self.gas}, вода м3/мес: {self.water}, время работы:  {self.work_time}')    
 
 
-class WellTRPressure(db.Model):
+class WellTRPressure(Base):
+    __tablename__ = 'WellTRPressure'
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
