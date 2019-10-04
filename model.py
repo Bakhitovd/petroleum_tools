@@ -9,19 +9,31 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class WellsStartDates(Base):
-    __tablename__ = 'WellsStartDates'
+class WellWorkDates(Base):
+    __tablename__ = 'WellWorkDates'
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
-    pad = db.Column(db.String, nullable=False)
-    form = db.Column(db.Text, nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
-
+    stop_date = db.Column(db.DateTime, nullable=False)
     def __repr__(self):
-        return f'Cкважина: {self.name}, куст: {self.pad},\
-        плаcт: {self.form}, дата запуска по фонду: {self.start_date}'
+        return f'Cкважина: {self.name}, дата запуска : {self.start_date}, дата остановки : {self.stop_date}'
 
+class WellPad(Base):
+    __tablename__ = 'WellPad'   
+    id = db.Column(db.Integer, primary_key=True)
+    well_id = db.Column(db.String, nullable=False)
+    pad = db.Column(db.String, nullable=True)
+
+class WellFormation(Base):
+    __tablename__ = 'WellFormation'   
+    id = db.Column(db.Integer, primary_key=True)
+    well_id = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    form = db.Column(db.String, nullable=False)
+    pad = db.Column(db.String, nullable=False)
+    perf_form_date = db.Column(db.DateTime, nullable=False)
+    shut_form_date = db.Column(db.DateTime, nullable=False) 
 
 class WellMonthRates(Base):  #Добавить 
     __tablename__ = 'WellMonthRates'
