@@ -31,7 +31,6 @@ class WellFormation(Base):
     well_id = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
     form = db.Column(db.String, nullable=False)
-    pad = db.Column(db.String, nullable=False)
     perf_form_date = db.Column(db.DateTime, nullable=False)
     shut_form_date = db.Column(db.DateTime, nullable=False) 
 
@@ -70,17 +69,60 @@ class WellTRPressure(Base):
     __tablename__ = 'WellTRPressure'
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    annular_pressure = db.Column(db.Float, nullable=True)
+    buff_pressure = db.Column(db.Float, nullable=True)
+    line_pressure = db.Column(db.Float, nullable=True)
+
+    def __init__(self,well_id, date, buff_pressure, annular_pressure, line_pressure):
+        self.well_id = well_id.strip()
+        try:
+            self.date = date.strip()
+            self.date = datetime.strptime(date, '%d.%m.%Y')
+        except:
+            self.date=date
+        try:
+            self.annular_pressure = float(annular_pressure)
+        except:
+            self.annular_pressure = 0
+        try:        
+            self.buff_pressure = float(buff_pressure)
+        except:
+            self.buff_pressure = 0
+        
+        try:
+            self.line_pressure = float(buff_pressure)      
+        except:
+            self.line_pressure = 0
+
+
+class WellBHPPressure(Base):
+    __tablename__ = 'WellBHPPressure'
+    id = db.Column(db.Integer, primary_key=True)
+    well_id = db.Column(db.String, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
     bhp = db.Column(db.Float, nullable=True)
-    buff_pressure = db.Column(db.Float, nullable=True)
-    annular_pressure = db.Column(db.Float, nullable=True)
-    line_pressure = db.Column(db.Float, nullable=True)
-    form_pressure = db.Column(db.Float, nullable=True)
+    form_pressure1 = db.Column(db.Float, nullable=True)
+    form_pressure2 = db.Column(db.Float, nullable=True)
 
-    def __repr__(self):
-        return f'Cкважина: {self.name}, дата: {self.date}, нефть т/мес: {self.bhp}, \
-        буферное давление: {self.buff_pressure}, затрубное давление: {self.annular_pressure}, \
-        линейное давление:  {self.line_pressure}, пластовое давление {self.form_pressure}'    
+    def __init__(self,well_id, date, bhp, form_pressure1, form_pressure2):
+        self.well_id = well_id.strip()
+        try:
+            self.date = date.strip()
+            self.date = datetime.strptime(date, '%d.%m.%Y')
+        except:
+            self.date=date     
+        try:
+            self.bhp = float(bhp)
+        except:
+            self.bhp = 0
+        try:        
+            self.form_pressure1 = float(form_pressure1)
+        except:
+            self.form_pressure1 = 0
 
+        try:        
+            self.form_pressure2 = float(form_pressure2)
+        except:
+            self.form_pressure2 = 0    
 
