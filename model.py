@@ -26,7 +26,7 @@ class WellPad(Base):
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)# id скважины
     pad = db.Column(db.String, nullable=True)#номер куста с которого пробурена скважина
-   """
+"""
     Важная информация.Номер куста,хранится в отдельной таблице. 
 """
 class WellFormation(Base):
