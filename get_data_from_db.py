@@ -12,15 +12,10 @@ session = Session()
 field_oil = []
 field_gas = []
 dates = []
-for row in session.query(WellMonthRates).order_by(WellMonthRates.date):
-    date = row.date
-    if date not in dates:
-        dates.append(date)
 
-for date in dates:
-    row = session.query(func.sum(WellMonthRates.oil)).filter_by(date = date)
-    field_oil.append(row.scalar())
-    
+for row in session.query(WellMonthRates.date, func.sum(WellMonthRates.oil)).group_by(WellMonthRates.date):
+    field_oil.append(row[1])
+    dates.append(row[0])
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(
