@@ -4,13 +4,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, func
 from config import SQLALCHEMY_DATABASE_URI
 import plotly.graph_objects as go
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
-#Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
-field_oil = []
-field_gas = []
-dates = []
 
 def gaf_creation(x,y,name):
     fig = go.Figure()
@@ -22,14 +15,22 @@ def gaf_creation(x,y,name):
     ))
     fig.show()
    
-for row in session.query(WellMonthRates.date, func.sum(WellMonthRates.oil),
-func.sum(WellMonthRates.gas)).group_by(WellMonthRates.date):
-    field_oil.append(row[1])
-    field_gas.append(row[2])
-    dates.append(row[0])
+def get_oil_from_merfond(bd_session, array_y, date_array):
+    for row in bd_session.query(WellMonthRates.date, func.sum(WellMonthRates.oil)).group_by(WellMonthRates.date):
+        array_y.append(row[1])
+        date_array.append(row[0])
+    return (date_array, array_y)
 
-gaf_creation(dates, field_oil,"Нефть")    
-gaf_creation(dates, field_gas,"Газ") 
+if __name__ == '__main__':
+    engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    field_oil = []
+    dates = []
+    dates = get_oil_from_merfond(session, field_oil, dates)[0]
+    field_oil = get_oil_from_merfond(session, field_oil, dates)[1]
+    gaf_creation(dates, field_oil,"Нефть")    
+    
 
 
 
