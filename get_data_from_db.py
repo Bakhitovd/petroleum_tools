@@ -27,8 +27,7 @@ if __name__ == '__main__':
     session = Session()
     field_oil = []
     dates = []
-    dates = get_oil_from_merfond(session, field_oil, dates)[0]
-    field_oil = get_oil_from_merfond(session, field_oil, dates)[1]
+    dates, field_oil = get_oil_from_merfond(session, field_oil, dates)
     gaf_creation(dates, field_oil,"Нефть")    
     
 
