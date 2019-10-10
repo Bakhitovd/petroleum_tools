@@ -15,20 +15,76 @@ def gaf_creation(x,y,name):
     ))
     fig.show()
    
-def get_oil_from_merfond(bd_session, array_y, date_array):
-    for row in bd_session.query(WellMonthRates.date, func.sum(WellMonthRates.oil)).group_by(WellMonthRates.date):
-        array_y.append(row[1])
-        date_array.append(row[0])
-    return (date_array, array_y)
+def get_month_well_data_from_merfond(bd_session, name):
+    well_oil = []
+    well_gas = []
+    well_water = []
+    well_injection = []
+    dates = []
+    for row in bd_session.query(WellMonthRates.date, 
+                                WellMonthRates.oil,
+                                WellMonthRates.gas,
+                                WellMonthRates.water,
+                                WellMonthRates.injection
+                                ).filter_by(name=name).order_by(WellMonthRates.date):
+        dates.append(row[0])
+        well_oil.append(row[1])
+        well_gas.append(row[2])
+        well_water.append(row[3])
+        well_injection.append(row[4])
+        
+    return (dates, well_oil, well_gas, well_water, well_injection)
+'''
+def get_well_data_from_merfond(bd_session, name):
+    well_oil = []
+    well_gas = []
+    well_water = []
+    well_injection = []
+    dates = []
+    for row in bd_session.query(WellMonthRates.date, 
+                                WellMonthRates.oil,
+                                WellMonthRates.gas,
+                                WellMonthRates.water,
+                                WellMonthRates.injection
+                                ).filter_by(name=name).order_by(WellMonthRates.date):
+        dates.append(row[0])
+        well_oil.append(row[1])
+        well_gas.append(row[2])
+        well_water.append(row[3])
+        well_injection.append(row[4])
+        
+    return (dates, well_oil, well_gas, well_water, well_injection)
+'''
+def get_field_data_from_merfond(bd_session):
+    field_oil = []
+    field_gas = []
+    field_water = []
+    field_injection = []
+    dates = []
+    for row in bd_session.query(WellMonthRates.date, 
+                                func.sum(WellMonthRates.oil),
+                                func.sum(WellMonthRates.gas),
+                                func.sum(WellMonthRates.water),
+                                func.sum(WellMonthRates.injection),
+                                ).group_by(WellMonthRates.date):
+        dates.append(row[0])
+        field_oil.append(row[1])
+        field_gas.append(row[2])
+        field_water.append(row[3])
+        field_injection.append(row[4])
+        
+    return (dates, field_oil, field_gas, field_water, field_injection)
 
 if __name__ == '__main__':
     engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
     Session = sessionmaker(bind=engine)
     session = Session()
-    field_oil = []
-    dates = []
-    dates, field_oil = get_oil_from_merfond(session, field_oil, dates)
-    gaf_creation(dates, field_oil,"Нефть")    
+    #dates, field_oil, field_gas, field_water, field_injection = get_field_data_from_merfond(session)
+    dates, field_oil, field_gas, field_water, field_injection = get_month_well_data_from_merfond(session, "8148")
+    gaf_creation(dates, field_oil,"Нефть")
+    #gaf_creation(dates, field_gas,"Газ")
+    gaf_creation(dates, field_water,"Вода")
+    gaf_creation(dates, field_injection,"Закачка")    
     
 
 
