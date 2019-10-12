@@ -167,7 +167,7 @@ with open('ois\db70.rabpl.csv', 'r', encoding = 'utf-8-sig') as f:
         well_id = line['SK_1']
         if float(well_id) >= 500000000 and float(well_id) <= 500999900:
             if line['D2_1'] == '99999999':
-                shut_form_date =  datetime.strptime('00010101', '%Y%m%d')
+                shut_form_date = datetime.today() # datetime.strptime('00010101', '%Y%m%d')
             else:
                 shut_form_date = datetime.strptime(line['D2_1'], '%Y%m%d')
             save_form_dates(               
