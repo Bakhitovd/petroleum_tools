@@ -9,16 +9,6 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-def save_month_rate(well_id, name, date, oil, gas, water, injection, work_time):
-    well_month_exists = session.query(WellMonthRates).filter_by(well_id = well_id, date = datetime.strptime(date, '%Y%m%d')).count()
-    if not well_month_exists:
-        well_date = WellMonthRates(well_id=well_id, name=name, date=date, oil=oil, gas=gas,
-        water=water, injection=injection, work_time=work_time)
-        session.add(well_date)
-"""
-Функция для записи в локальную БД месячных показателей работы скважин. Добыча нефти, газа, воды, закачка 
-и время работы за месяц в часах.
-"""
 def save_work_dates(well_id, name, start_date, stop_date):
     well_start_date = session.query(WellWorkDates).filter_by(well_id = well_id, start_date=start_date).count()
     if not well_start_date:
@@ -69,7 +59,65 @@ def save_bhp_pressures(well_id, date, bhp, form_pressure1, form_pressure2):
 Функция для записи в локальную БД информацию о технологических режимах скважин, а именно забойное давление
 и пластовое даление 
 """
-
+def save_month_rate(well_id, name, date, oil_day, gas_day, water_day, injection_day, gor, wc,
+    oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum, work_time, work_time_cum):
+    well_month_exists = session.query(WellMonthRates).filter_by(well_id = well_id, date = datetime.strptime(date, '%Y%m%d')).count()
+    if not well_month_exists:
+        well_date = WellMonthRates(
+        well_id=well_id, 
+        name=name,
+        date=date, 
+        oil_day=oil_day, 
+        gas_day=gas_day,
+        water_day=water_day,
+        injection_day=injection_day,
+        gor=gor,
+        wc=wc,
+        oil=oil,
+        gas=gas,
+        water=water,
+        injection=injection,
+        oil_cum=oil_cum,
+        gas_cum=gas_cum,
+        water_cum=water_cum,
+        injection_cum=injection_cum,
+        work_time=work_time, 
+        work_time_cum=work_time_cum)
+        session.add(well_date)
+"""
+Функция для записи в локальную БД месячных показателей работы скважин. Добыча нефти, газа, воды, закачка 
+и время работы за месяц в часах.
+"""
+with open('ois\merfond.csv', 'r', encoding = 'utf-8-sig') as f:
+    mer = csv.DictReader(f, delimiter = ';')   
+    for line in mer:
+        well_id = line['SK_1']
+        if float(well_id) >= 500000000 and float(well_id) <= 500999900:
+            save_month_rate(               
+            well_id = well_id,
+            name=line['S1_1'],
+            date=line['DT_1'],
+            oil_day=(float(line['N1_1'])+float(line['K1_1']))/(float(line['TR_1'])/24),
+            gas_day=(float(line['G1_1'])+float(line['H1_1']))/(float(line['TR_1'])/24),
+            water_day=float(line['V1_1'])/(float(line['TR_1'])/24),
+            injection_day=float(line['Z1_1'])/(float(line['TR_1'])/24),
+            gor=line['GF_1'],
+            wc=line['SW_1'],
+            oil=(float(line['N1_1'])+float(line['K1_1'])),
+            gas=(float(line['G1_1'])+float(line['H1_1'])),
+            water=line['V1_1'],
+            injection=line['Z1_1'],
+            oil_cum=(float(line['N3_1'])+float(line['K3_1'])),
+            gas_cum=(float(line['G3_1'])+float(line['H3_1'])),
+            water_cum=line['V3_1'],
+            injection_cum=line['Z3_1'],
+            work_time=line['TR_1'],
+            work_time_cum=line['TEKSR_1']
+                   )      
+"""
+Чтение файла с месячными показателями работы скважин. Добыча нефти, газа, воды, закачка 
+и время работы за месяц в часах
+"""
 with open('ois\well_op.csv', 'r', encoding = 'utf-8-sig') as w:
     tr = csv.DictReader(w, delimiter = ';')   
     for line in tr:
@@ -152,23 +200,5 @@ with open('ois\db70.sost.csv', 'r', encoding = 'utf-8-sig') as f:
 Чтение файла с периодами работы
 """
 
-with open('ois\merfond.csv', 'r', encoding = 'utf-8-sig') as f:
-    mer = csv.DictReader(f, delimiter = ';')   
-    for line in mer:
-        well_id = line['SK_1']
-        if float(well_id) >= 500000000 and float(well_id) <= 500999900:
-            save_month_rate(               
-            well_id = well_id,
-            name=line['S1_1'],
-            date=line['DT_1'],
-            oil=line['N1_1'],
-            gas=line['G1_1'],
-            water=line['V1_1'],
-            injection=line['Z1_1'],
-            work_time=line['TEKSR_1']
-                   )      
-"""
-Чтение файла с месячными показателями работы скважин. Добыча нефти, газа, воды, закачка 
-и время работы за месяц в часах
-"""
+
 session.commit()       

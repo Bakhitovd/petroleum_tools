@@ -42,32 +42,54 @@ class WellFormation(Base):
 и работает на этот пласт всю жизнь. Но бывает такое что скважину перебуривают или перестреливают на 
 другой пласт и тогда возникают неудобства с учетом и анализом. Поэтому лучше иметь такую таблицу. 
 """
-class WellMonthRates(Base):  #Добавить 
+class WellMonthRates(Base):  
     __tablename__ = 'WellMonthRates'
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
-    date = db.Column(db.DateTime, nullable=False)#месяц за который приведена добыча
+    date = db.Column(db.DateTime, nullable=False)#месяц за который приведена добыча 
+    oil_day = db.Column(db.Float, nullable=True)#среднесуточный дебит нефти
+    gas_day = db.Column(db.Float, nullable=True)#среднесуточный дебит газа
+    water_day = db.Column(db.Float, nullable=True)#среднесуточный дебит пластовой воды
+    injection_day = db.Column(db.Float, nullable=True)#среднесуточная приемистость  
+    gor = db.Column(db.Float, nullable=True)# Средний газовый фактор
+    wc = db.Column(db.Float, nullable=True)#Средняя обводненность 
     oil = db.Column(db.Float, nullable=True)#число тонн нефти добытой за этот месяц
     gas = db.Column(db.Float, nullable=True)#число кубометров добытого попутного нефтянного газа
     water = db.Column(db.Float, nullable=True)#число кубометров добытой пластовой воды
-    injection = db.Column(db.Float, nullable=True)#число закачанной воды за месяц 
-    work_time = db.Column(db.Float, nullable=True)#число часов работы скважины за месяц(скважина могла работать не весь месяц)
-    
-    def __init__(self,well_id, name, date, oil, gas, water, injection, work_time):
+    injection = db.Column(db.Float, nullable=True)#число закачанной воды за месяц  
+    oil_cum = db.Column(db.Float, nullable=True)#накопленное число тонн нефти добытой за этот месяц
+    gas_cum = db.Column(db.Float, nullable=True)#накопленное число кубометров добытого попутного нефтянного газа
+    water_cum = db.Column(db.Float, nullable=True)#накопленное число кубометров добытой пластовой воды
+    injection_cum = db.Column(db.Float, nullable=True)#накопленное число закачанной воды за месяц 
+    work_time = db.Column(db.Float, nullable=True)#время работы за месяц
+    work_time_cum = db.Column(db.Float, nullable=True)#накопленное время работы
+
+    def __init__(self,well_id, name, date, oil_day, gas_day, water_day, injection_day, gor, wc,
+    oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum, work_time, work_time_cum):
         self.well_id = well_id.strip()
         self.name = name.strip()
         try:
             self.date = date.strip()
             self.date = datetime.strptime(date, '%Y%m%d')
         except:
-            self.date=date          
+            self.date=date           
+        self.oil_day = float(oil_day)
+        self.gas_day = float(gas_day)
+        self.water_day = float(water_day)
+        self.injection_day = float(injection_day)
+        self.gor = float(gor)
+        self.wc = float(wc)
         self.oil = float(oil)
         self.gas = float(gas)
         self.water = float(water)
-        self.injection = float(injection)
+        self.injection = float(injection) 
+        self.oil_cum = float(oil_cum)
+        self.gas_cum = float(gas_cum)
+        self.water_cum = float(water_cum)
+        self.injection_cum = float(injection_cum)
         self.work_time = float(work_time)
-
+        self.work_time_cum = float(work_time_cum)
     def __repr__(self):
         return (f'Cкважина: {self.name}, дата: {self.date}, нефть т/мес: {self.oil},\
         газ м3/мес: {self.gas}, вода м3/мес: {self.water}, время работы:  {self.work_time}')    
