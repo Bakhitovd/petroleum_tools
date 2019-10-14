@@ -47,11 +47,7 @@ class WellMonthRates(Base):
     id = db.Column(db.Integer, primary_key=True)
     well_id = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
-    date = db.Column(db.DateTime, nullable=False)#месяц за который приведена добыча 
-    oil_day = db.Column(db.Float, nullable=True)#среднесуточный дебит нефти
-    gas_day = db.Column(db.Float, nullable=True)#среднесуточный дебит газа
-    water_day = db.Column(db.Float, nullable=True)#среднесуточный дебит пластовой воды
-    injection_day = db.Column(db.Float, nullable=True)#среднесуточная приемистость  
+    date = db.Column(db.DateTime, nullable=False)#месяц за который приведена добыча  
     gor = db.Column(db.Float, nullable=True)# Средний газовый фактор
     wc = db.Column(db.Float, nullable=True)#Средняя обводненность 
     oil = db.Column(db.Float, nullable=True)#число тонн нефти добытой за этот месяц
@@ -65,7 +61,7 @@ class WellMonthRates(Base):
     work_time = db.Column(db.Float, nullable=True)#время работы за месяц
     work_time_cum = db.Column(db.Float, nullable=True)#накопленное время работы
 
-    def __init__(self,well_id, name, date, oil_day, gas_day, water_day, injection_day, gor, wc,
+    def __init__(self,well_id, name, date, gor, wc,
     oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum, work_time, work_time_cum):
         self.well_id = well_id.strip()
         self.name = name.strip()
@@ -74,10 +70,6 @@ class WellMonthRates(Base):
             self.date = datetime.strptime(date, '%Y%m%d')
         except:
             self.date=date           
-        self.oil_day = float(oil_day)
-        self.gas_day = float(gas_day)
-        self.water_day = float(water_day)
-        self.injection_day = float(injection_day)
         self.gor = float(gor)
         self.wc = float(wc)
         self.oil = float(oil)

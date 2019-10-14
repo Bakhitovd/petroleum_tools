@@ -59,7 +59,7 @@ def save_bhp_pressures(well_id, date, bhp, form_pressure1, form_pressure2):
 Функция для записи в локальную БД информацию о технологических режимах скважин, а именно забойное давление
 и пластовое даление 
 """
-def save_month_rate(well_id, name, date, oil_day, gas_day, water_day, injection_day, gor, wc,
+def save_month_rate(well_id, name, date, gor, wc,
     oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum, work_time, work_time_cum):
     well_month_exists = session.query(WellMonthRates).filter_by(well_id = well_id, date = datetime.strptime(date, '%Y%m%d')).count()
     if not well_month_exists:
@@ -67,10 +67,6 @@ def save_month_rate(well_id, name, date, oil_day, gas_day, water_day, injection_
         well_id=well_id, 
         name=name,
         date=date, 
-        oil_day=oil_day, 
-        gas_day=gas_day,
-        water_day=water_day,
-        injection_day=injection_day,
         gor=gor,
         wc=wc,
         oil=oil,
@@ -97,10 +93,6 @@ with open('ois\merfond.csv', 'r', encoding = 'utf-8-sig') as f:
             well_id = well_id,
             name=line['S1_1'],
             date=line['DT_1'],
-            oil_day=(float(line['N1_1'])+float(line['K1_1']))/(float(line['TR_1'])/24),
-            gas_day=(float(line['G1_1'])+float(line['H1_1']))/(float(line['TR_1'])/24),
-            water_day=float(line['V1_1'])/(float(line['TR_1'])/24),
-            injection_day=float(line['Z1_1'])/(float(line['TR_1'])/24),
             gor=line['GF_1'],
             wc=line['SW_1'],
             oil=(float(line['N1_1'])+float(line['K1_1'])),

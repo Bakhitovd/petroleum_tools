@@ -24,18 +24,10 @@ if __name__ == '__main__':
                     data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['gas_day']=round(row.gas/(row.work_time/24), 2)
                     data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['water_day']=round(row.water/(row.work_time/24), 2)
                     data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['injection_day']=round(row.injection/(row.work_time/24), 2)
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['gor']=row.gor
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['wc']=row.wc
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['oil']=row.oil
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['gas']=row.gas
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['water']=row.water
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['injection']=row.injection
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['oil_cum']=row.oil_cum
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['gas_cum']=row.gas_cum
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['water_cum']=row.water_cum
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['injection_cum']=row.injection_cum
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['work_time']=row.work_time
-                    data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)]['work_time_cum']=row.work_time_cum
+                    sets = ['oil', 'gas', 'water', 'injection', 'gor', 'wc', 'oil_cum', 'gas_cum', 'water_cum', 'injection_cum', 'work_time', 'work_time_cum']
+                    for i in sets:
+                        data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(row.date)][i]=getattr(row,i)
+
     json.dumps(data)
     with open("data", "w", encoding="utf-8") as file:
         json.dump(data, file)
