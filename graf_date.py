@@ -27,32 +27,16 @@ engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 dates, field_oil= get_field_data_from_merfond(session)
-print(min(dates))
-print(len(dates))
 
 app.layout = html.Div([
     dcc.Graph(
-        id='Oil Field',
-        figure={
-            'data': [
-                go.Scatter(
-                    x=dates,
-                    y=field_oil,
-                    mode='lines',
-                    opacity=0.7,
-                    marker={
-                        'size': 15,
-                        'line': {'width': 0.5, 'color': 'white'}
-                    }
-                ) 
-            ]
-            }),
+        id='Oil Field'),
     dcc.RangeSlider(
         id='my-range-slider',
         min=0,
-        max=len(dates),
+        max=len(dates)-1,
         step=1,
-        value=[0, len(dates)]
+        value=[0, len(dates)-1]
     ),
     html.Div(id='output-container-range-slider')
 ])
@@ -61,23 +45,33 @@ app.layout = html.Div([
     dash.dependencies.Output('output-container-range-slider', 'children'),
     [dash.dependencies.Input('my-range-slider', 'value')])
 def update_output(value):
-    return 'с {} по {}'.format(dates[value[0]].strftime('%d.%m.%y'), dates[value[1]].strftime('%d.%m.%y'))
+    date1=dates[value[0]].strftime('%d.%m.%y')
+    date2=dates[value[1]].strftime('%d.%m.%y')
+    return 'с {} по {}'.format(date1, date2)
   
 
 @app.callback(    
     dash.dependencies.Output('Oil Field', 'figure'),
     [dash.dependencies.Input('my-range-slider', 'value')])
 def update_figure(value):
-
-    return {'layout': go.Layout(
-            xaxis={'range': [dates[value[0]], dates[value[1]]]},
-            yaxis={'title': 'Добыча нефти'},
-            margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-            hovermode='closest'
-        )}    
-
-
-
+    date1=dates[value[0]].date()
+    date2=dates[value[1]].date()
+    return {'data': [go.Scatter(
+                    x=dates,
+                    y=field_oil,
+                    mode='lines',
+                    opacity=0.7,
+                    marker={
+                        'size': 15,
+                        'line': {'width': 0.5, 'color': 'white'}
+                    }
+                    )],
+            'layout': go.Layout(
+                    xaxis={'range':[date1, date2]},
+                    yaxis={'title': 'Добыча нефти'},
+                    margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
+                    hovermode='closest'
+           )}    
+           
 if __name__ == '__main__':
     app.run_server(debug=True)
-
