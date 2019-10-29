@@ -1,5 +1,5 @@
 from get_data_from_db import get_data
-from functions import summm_data
+from functions import summm_data, production_fond_data,injection_fond_data, summ_inj_data, create_figure, create_figure_bar
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, func
 from config import SQLALCHEMY_DATABASE_URI
@@ -14,6 +14,11 @@ import collections
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)   
 
+chart_deps = [dash.dependencies.Input('formation-selection', 'value'),
+              dash.dependencies.Input('pad-selection', 'value'),
+              dash.dependencies.Input('wells-selection', 'value'),
+              dash.dependencies.Input('date-range-slider', 'value')]
+
 with open("data", "r", encoding="utf-8") as file:
     data = json.load(file)
 
@@ -23,8 +28,8 @@ for i in forms:
     label_forms.append(
         {'label': i, 'value': i}
     )
-dates_list = []
 
+dates_list = []
 for f in data:
     for p in data[f]: 
         for w in data[f][p]:
@@ -54,7 +59,11 @@ app.layout = html.Div([
                 multi=True)      
         ],style={'width': '33%', 'display': 'inline-block'}),
 
-    ]),
+    ], style={
+        'borderBottom': 'thin lightgrey solid',
+        'backgroundColor': 'rgb(250, 250, 250)',
+        'padding': '10px 5px'
+    }),
     html.Div([
             html.Label('Отображаемый период:'),    
             dcc.RangeSlider(
@@ -64,35 +73,49 @@ app.layout = html.Div([
                 step=1,
                 value = [0, len(dates_list)-1]),
             html.Div(id='output-container-range-slider')
-    ]),
+    ], style={
+        'borderBottom': 'thin lightgrey solid',
+        'backgroundColor': 'rgb(250, 250, 250)',
+        'padding': '10px 15px'
+    }),
     html.Div([
 
         html.Div([
-            html.Label('Добыча нефти'), 
             dcc.Graph(id='chart1')
-        ],style={'width': '49%', 'display': 'inline-block'}),
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '0px 5px 5px 5px' }),
 
         html.Div([
-            html.Label('Добыча газа'), 
             dcc.Graph(id='chart2')
-        ],style={'width': '49%', 'display': 'inline-block'}),
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 5px 5px' }),
         
+    ], style={
+        'borderBottom': 'thin lightgrey solid',
+        'backgroundColor': 'rgb(211, 217, 224)'
+    }),
+    html.Div([
+
+        html.Div([
+            dcc.Graph(id='chart4')
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 0px 5px' }),
+
+        html.Div([
+            dcc.Graph(id='chart3')
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 0px 5px' }),    
     ]),
     html.Div([
 
         html.Div([
-            html.Label('Закачка'), 
-            dcc.Graph(id='chart3')
-        ],style={'width': '49%', 'display': 'inline-block'}),
+            dcc.Graph(id='chart5')
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 0px 5px' }),
 
-       # html.Div([
-       #     html.Label('Фонд'), 
-       #     dcc.Graph(id='chart4')
-       # ],style={'width': '49%', 'display': 'inline-block'}),
-        
+        html.Div([
+            dcc.Graph(id='chart6')
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 0px 5px' }),    
     ])
-
-])
+], style={
+        'borderBottom': 'thin lightgrey solid',
+        'backgroundColor': 'rgb(211, 217, 224)'
+})
 
 @app.callback(
     dash.dependencies.Output('output-container-range-slider', 'children'),
@@ -144,99 +167,40 @@ def set_wells(selected_pads):
     return selected_pads[0]['value']
 
 @app.callback(    
-    dash.dependencies.Output('chart1', 'figure'),
-    [dash.dependencies.Input('formation-selection', 'value'),
-    dash.dependencies.Input('pad-selection', 'value'),
-    dash.dependencies.Input('wells-selection', 'value'),
-    dash.dependencies.Input('date-range-slider', 'value')])
+    dash.dependencies.Output('chart1', 'figure'), chart_deps)
 def update_figure(selected_forms, selected_pads, selected_wells, date_range):
     output_arr = summm_data(data, selected_forms, selected_pads, selected_wells, 'oil')
-    if len(list(output_arr.keys())) > 1:    
-        date1=dates_list[date_range[0]]
-        date2=dates_list[date_range[1]]
-    else:
-        date1=1
-        date2=2  
-    return {'data': [go.Scatter(
-                    x=list(output_arr.keys()),
-                    y=list(output_arr.values()),
-                    mode='lines',
-                    opacity=0.7,
-                    marker={
-                        'size': 15,
-                        'line': {'width': 0.5, 'color': 'white'}
-                    }
-                    )],
-            'layout': go.Layout(
-                    xaxis={'range':[date1, date2]},
-                    yaxis={'title': 'Добыча нефти'},
-                    margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-                    hovermode='closest'
-           )}    
-
+    return create_figure(output_arr, dates_list, date_range, 'Добыча нефти', 'Добыча нефти, т/мес.')
+ 
 @app.callback(    
-    dash.dependencies.Output('chart2', 'figure'),
-    [dash.dependencies.Input('formation-selection', 'value'),
-    dash.dependencies.Input('pad-selection', 'value'),
-    dash.dependencies.Input('wells-selection', 'value'),
-    dash.dependencies.Input('date-range-slider', 'value')])
+    dash.dependencies.Output('chart2', 'figure'), chart_deps)
 def update_figure(selected_forms, selected_pads, selected_wells, date_range):
     output_arr = summm_data(data, selected_forms, selected_pads, selected_wells, 'gas')
-    if len(list(output_arr.keys())) > 1:    
-        date1=dates_list[date_range[0]]
-        date2=dates_list[date_range[1]]
-    else:
-        date1=1
-        date2=2  
-    return {'data': [go.Scatter(
-                    x=list(output_arr.keys()),
-                    y=list(output_arr.values()),
-                    mode='lines',
-                    opacity=0.7,
-                    marker={
-                        'size': 15,
-                        'line': {'width': 0.5, 'color': 'white'}
-                    }
-                    )],
-            'layout': go.Layout(
-                    xaxis={'range':[date1, date2]},
-                    yaxis={'title': 'Добыча нефти'},
-                    margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-                    hovermode='closest'
-                    
-           )}    
+    return create_figure(output_arr, dates_list, date_range, 'Добыча газа', 'Добыча газа, м3/мес.')
+    
+@app.callback(    
+    dash.dependencies.Output('chart3', 'figure'), chart_deps)
+def update_figure(selected_forms, selected_pads, selected_wells, date_range):
+    output_arr = summ_inj_data(data, selected_forms, selected_pads, selected_wells, 'gas_inj')
+    return create_figure(output_arr, dates_list, date_range, 'Закачка газа', 'Закачка газа, м3/мес.')
 
 @app.callback(    
-    dash.dependencies.Output('chart3', 'figure'),
-    [dash.dependencies.Input('formation-selection', 'value'),
-    dash.dependencies.Input('pad-selection', 'value'),
-    dash.dependencies.Input('wells-selection', 'value'),
-    dash.dependencies.Input('date-range-slider', 'value')])
+    dash.dependencies.Output('chart4', 'figure'), chart_deps)
 def update_figure(selected_forms, selected_pads, selected_wells, date_range):
-    output_arr = summm_data(data, selected_forms, selected_pads, selected_wells, 'injection')
-    if len(list(output_arr.keys())) > 1:    
-        date1=dates_list[date_range[0]]
-        date2=dates_list[date_range[1]]
-    else:
-        date1=1
-        date2=2  
-    return {'data': [go.Scatter(
-                    x=list(output_arr.keys()),
-                    y=list(output_arr.values()),
-                    mode='lines',
-                    opacity=0.7,
-                    marker={
-                        'size': 15,
-                        'line': {'width': 0.5, 'color': 'white'}
-                    }
-                    )],
-            'layout': go.Layout(
-                    xaxis={'range':[date1, date2]},
-                    yaxis={'title': 'Закачка'},
-                    margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
-                    hovermode='closest'
-                    
-           )}    
+    output_arr = summ_inj_data(data, selected_forms, selected_pads, selected_wells, 'water_inj')
+    return create_figure(output_arr, dates_list, date_range, 'Закачка воды', 'Закачка воды, м3/мес.')
 
+@app.callback(    
+    dash.dependencies.Output('chart5', 'figure'), chart_deps)
+def update_figure(selected_forms, selected_pads, selected_wells, date_range):
+    output_arr = production_fond_data(data, selected_forms, selected_pads, selected_wells)
+    return create_figure_bar(output_arr, dates_list, date_range, 'Работающий фонт добывающих скважин', 'Добывающий фонд, шт.')
+ 
+@app.callback(    
+    dash.dependencies.Output('chart6', 'figure'), chart_deps)
+def update_figure(selected_forms, selected_pads, selected_wells, date_range):
+    output_arr = injection_fond_data(data, selected_forms, selected_pads, selected_wells)
+    return create_figure_bar(output_arr, dates_list, date_range, 'Работающий нагнетательный фонд', 'Нагнетательный фонд, шт.')
+        
 if __name__ == '__main__':
     app.run_server(debug=True)

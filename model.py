@@ -120,7 +120,6 @@ class WellTRPressure(Base):
         except:
             self.line_pressure = 0
 
-
 class WellBHPPressure(Base):
     __tablename__ = 'WellBHPPressure'
     id = db.Column(db.Integer, primary_key=True)

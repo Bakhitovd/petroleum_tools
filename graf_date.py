@@ -30,15 +30,8 @@ session = Session()
 dates, field_oil= get_field_data_from_merfond(session)
 
 
-data1 = get_data(session)
-forms = list(data1.keys())
-label_forms = []
 
 
-for i in forms:
-    label_forms.append(
-        {'label': i, 'value': i}
-    )
 
 app.layout = html.Div([
     dcc.Graph(
@@ -50,39 +43,9 @@ app.layout = html.Div([
         step=1,
         value=[0, len(dates)-1]
     ),
-    html.Div(id='output-container-range-slider'),
+    html.Div(id='output-container-range-slider')
 
-    html.Label('Выберете пласт:'),
-    dcc.Dropdown(
-        id = 'formation-selection',
-        options=label_forms,
-        value=[],
-        multi=True
-    ),
-
-    html.Label('Выберете куст:'),
-    dcc.Dropdown(id = 'pad-selection',
-        multi=True
-    )
 ])
-
-@app.callback(
-    dash.dependencies.Output('pad-selection', 'options'),
-    [dash.dependencies.Input('formation-selection', 'value')])
-def update_output(value):
-    label_pads = [{'label': 'Все', 'value': 'Все'}]
-    for i in list(value):
-        label_pads.append(
-        {'label': data1[i], 'value': data1[i]}
-    )
-    options = label_pads
-    return options
-
-@app.callback(
-    dash.dependencies.Output('pad-selection', 'value'),
-    [dash.dependencies.Input('pad-selection', 'options')])
-def set_cities_value(available_options):
-    return available_options[0]['value']
 
 
 @app.callback(

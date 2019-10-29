@@ -20,8 +20,35 @@ def save_work_dates(well_id, name, start_date, stop_date):
 """
 def save_form_dates(well_id, name, form, perf_form_date, shut_form_date):
     well_perf_date = session.query(WellFormation).filter_by(well_id = well_id, perf_form_date=perf_form_date).count()
+    name_form={'PL4030': 'АЧ3-4',
+                'PL0324': 'ПК 7-9',
+                'PL0314': 'ПК 5-9',
+                'PL0826': 'БЯ 24',
+                'PL0827': 'PZ',
+                'PL0801': 'ТП 0',
+                'PL0802': 'XM 1',
+                'PL0803': 'XM 3',
+                'PL0807': 'БЯ 23',
+                'PL0808': 'БЯ 22',
+                'PL0809': 'Ю 2-6',
+                'PL0810': 'НП 8',
+                'PL0811': 'НП 7',
+                'PL0813': 'НП 5-1',
+                'PL0814': 'НП 4',
+                'PL0815': 'НП 2-3',
+                'PL0816': 'НП 1',
+                'PL0818': 'ТП 1-4',
+                'PL0182': 'АЧ4',
+                'PL0077': 'Ю1',
+                'PL0092': 'ПК1',
+                'PL0116': 'АЧ 5-2-3',
+                'PL0113': 'АЧ 5',
+                'PL0114': 'АЧ 6-0',
+                'PL0115': 'АЧ 5-1',
+                'PL0846': 'БЯ 27',
+                'PL0847': 'НП 1-12'}
     if not well_perf_date:
-        well_date = WellFormation(well_id=well_id, name=name, form = form,
+        well_date = WellFormation(well_id=well_id, name=name, form = name_form[form],
         perf_form_date=perf_form_date, shut_form_date=shut_form_date)
         session.add(well_date)
 """

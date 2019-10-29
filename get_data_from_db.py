@@ -45,16 +45,20 @@ def get_data(db_session):
                 data[str(row_form.form)][str(row_pad.pad)][well_name][str(true_date)]['bhp']=row.bhp
                 data[str(row_form.form)][str(row_pad.pad)][well_name][str(true_date)]['form_pressure1']=row.form_pressure1
 
-    return (data) 
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
-Session = sessionmaker(bind=engine)
-db_session = Session()
-data1 = get_data(db_session)
+    return (data)
+    
+if __name__ == '__main__':
+    engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+    Session = sessionmaker(bind=engine)
+    db_session = Session()
+    data1 = get_data(db_session)
+    print(list(data1.keys()))
+    print(list(data1['PL0814'].keys()))
+    print(list(data1['PL0814']['10'].keys()))
 
-
-json.dumps(data1)
-with open("data", "w", encoding="utf-8") as file:
-    json.dump(data1, file)
+    json.dumps(data1)
+    with open("data", "w", encoding="utf-8") as file:
+        json.dump(data1, file)
 
 
 
