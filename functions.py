@@ -229,7 +229,6 @@ def gas_water_inj(measurement, selected_pads):
     elif measurement == 'water_inj':
         gas_pads = ['101', '102', '103', '102_1', '103_1', '104']
         selected_pads = list(set(selected_pads)-set(gas_pads))
-    print(selected_pads)
     return selected_pads
 
 def summ_inj_data(data, selected_forms, selected_pads, selected_wells, measurement):
@@ -249,7 +248,9 @@ def summ_inj_data(data, selected_forms, selected_pads, selected_wells, measureme
                                 output_arr[d] = data[f][p][w][d]['injection']
     elif 'Все' in selected_pads or selected_pads =='Все':
         for f in selected_forms:
-            for p in data[f]: 
+            pad_list = []
+            pad_list = gas_water_inj(measurement, list(data[f].keys()))
+            for p in pad_list: 
                 for w in data[f][p]:
                     for d in data[f][p][w]:
                         try:
@@ -259,7 +260,9 @@ def summ_inj_data(data, selected_forms, selected_pads, selected_wells, measureme
                                 output_arr[d] = data[f][p][w][d]['injection']   
     elif  'Все' in selected_wells or selected_wells =='Все':
         for f in selected_forms:
-            for p in selected_pads:
+            pad_list = []
+            pad_list = gas_water_inj(measurement, selected_pads)
+            for p in pad_list: 
                 if p in data[f]:
                     for w in data[f][p]:
                         for d in data[f][p][w]:
@@ -270,7 +273,9 @@ def summ_inj_data(data, selected_forms, selected_pads, selected_wells, measureme
                                     output_arr[d] = data[f][p][w][d]['injection']
     else:
          for f in selected_forms:
-            for p in selected_pads:
+            pad_list = []
+            pad_list = gas_water_inj(measurement, selected_pads)
+            for p in pad_list:
                 for w in selected_wells:
                     if p in data[f] and w in data[f][p]:
                         for d in data[f][p][w]:
@@ -280,3 +285,13 @@ def summ_inj_data(data, selected_forms, selected_pads, selected_wells, measureme
                                 if 'injection' in list(data[f][p][w][d].keys()):
                                     output_arr[d] = data[f][p][w][d]['injection'] 
     return collections.OrderedDict(sorted(output_arr.items()))
+
+def compensation(dates_list, gas_summ_form, liquid_summ_form, injection_summ_water, injection_summ_gas):
+    output_arr = {}
+    for d in dates_list:
+        try:
+            output_arr[d] = 100 * (injection_summ_water[d] + injection_summ_gas[d]/190) / (gas_summ_form[d]/190 + liquid_summ_form[d])
+        except:
+            output_arr[d] = 0      
+    #print(output_arr)        
+    return output_arr

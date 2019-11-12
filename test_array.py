@@ -1,5 +1,5 @@
 from get_data_from_db import get_data
-from functions import summm_data, production_fond_data,injection_fond_data, summ_inj_data, create_figure, create_figure_bar
+from functions import summm_data, production_fond_data,injection_fond_data, summ_inj_data, create_figure, create_figure_bar, compensation
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, func
 from config import SQLALCHEMY_DATABASE_URI
@@ -111,6 +111,16 @@ app.layout = html.Div([
         html.Div([
             dcc.Graph(id='chart6')
         ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 0px 5px' }),    
+    ]),
+    html.Div([
+
+        html.Div([
+            dcc.Graph(id='chart7')
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 0px 5px' }),
+
+        html.Div([
+            dcc.Graph(id='chart8')
+        ],style={'width': '49%', 'display': 'inline-block', 'padding': '5px 5px 0px 5px' }),    
     ])
 ], style={
         'borderBottom': 'thin lightgrey solid',
@@ -201,6 +211,26 @@ def update_figure(selected_forms, selected_pads, selected_wells, date_range):
 def update_figure(selected_forms, selected_pads, selected_wells, date_range):
     output_arr = injection_fond_data(data, selected_forms, selected_pads, selected_wells)
     return create_figure_bar(output_arr, dates_list, date_range, 'Работающий нагнетательный фонд', 'Нагнетательный фонд, шт.')
-        
+
+@app.callback(    
+    dash.dependencies.Output('chart7', 'figure'), chart_deps)
+def update_figure(selected_forms, selected_pads, selected_wells, date_range):
+    gas_summ_form = summm_data(data, selected_forms, selected_pads, selected_wells, 'gas_form')
+    liquid_summ_form = summm_data(data, selected_forms, selected_pads, selected_wells, 'liquid_form')
+    injection_summ_water = summ_inj_data(data, selected_forms, selected_pads, selected_wells, 'water_inj')
+    injection_summ_gas = summ_inj_data(data, selected_forms, selected_pads, selected_wells, 'gas_inj')
+    output_arr = compensation(dates_list, gas_summ_form, liquid_summ_form, injection_summ_water, injection_summ_gas)
+    return create_figure_bar(output_arr, dates_list, date_range, 'Текущая компенсация', 'Текущая компенсация, %')
+
+@app.callback(    
+    dash.dependencies.Output('chart8', 'figure'), chart_deps)
+def update_figure(selected_forms, selected_pads, selected_wells, date_range):
+    gas_summ_form = summm_data(data, selected_forms, selected_pads, selected_wells, 'gas_form')
+    liquid_summ_form = summm_data(data, selected_forms, selected_pads, selected_wells, 'liquid_form')
+    injection_summ_water = summ_inj_data(data, selected_forms, selected_pads, selected_wells, 'water_inj')
+    injection_summ_gas = summ_inj_data(data, selected_forms, selected_pads, selected_wells, 'gas_inj')
+    output_arr = compensation(dates_list, gas_summ_form, liquid_summ_form, injection_summ_water, injection_summ_gas)
+    return create_figure_bar(output_arr, dates_list, date_range, 'Текущая компенсация', 'Текущая компенсация, %')
+               
 if __name__ == '__main__':
     app.run_server(debug=True)

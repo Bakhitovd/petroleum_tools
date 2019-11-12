@@ -58,11 +58,18 @@ class WellMonthRates(Base):
     gas_cum = db.Column(db.Float, nullable=True)#накопленное число кубометров добытого попутного нефтянного газа
     water_cum = db.Column(db.Float, nullable=True)#накопленное число кубометров добытой пластовой воды
     injection_cum = db.Column(db.Float, nullable=True)#накопленное число закачанной воды за месяц 
+    liquid_form = db.Column(db.Float, nullable=True)
+    liquid_form_cum = db.Column(db.Float, nullable=True)
+    gas_form = db.Column(db.Float, nullable=True)
+    gas_form_cum = db.Column(db.Float, nullable=True)
+    injection_form = db.Column(db.Float, nullable=True)
+    injection_form_cum = db.Column(db.Float, nullable=True)
     work_time = db.Column(db.Float, nullable=True)#время работы за месяц
     work_time_cum = db.Column(db.Float, nullable=True)#накопленное время работы
 
     def __init__(self,well_id, name, date, gor, wc,
-    oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum, work_time, work_time_cum):
+    oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum,
+    liquid_form, liquid_form_cum, gas_form, gas_form_cum, injection_form, injection_form_cum, work_time, work_time_cum):
         self.well_id = well_id.strip()
         self.name = name.strip()
         try:
@@ -80,6 +87,12 @@ class WellMonthRates(Base):
         self.gas_cum = float(gas_cum)
         self.water_cum = float(water_cum)
         self.injection_cum = float(injection_cum)
+        self.liquid_form = float(liquid_form)
+        self.liquid_form_cum = float(liquid_form_cum)
+        self.gas_form = float(gas_form)
+        self.gas_form_cum = float(gas_form_cum)
+        self.injection_form = float(injection_form)
+        self.injection_form_cum=float(injection_form_cum)
         self.work_time = float(work_time)
         self.work_time_cum = float(work_time_cum)
     def __repr__(self):

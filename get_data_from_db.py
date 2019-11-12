@@ -24,7 +24,8 @@ def get_data(db_session):
                     data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(true_date)]['gas_day']=round(row.gas/(row.work_time/24), 2)
                     data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(true_date)]['water_day']=round(row.water/(row.work_time/24), 2)
                     data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(true_date)]['injection_day']=round(row.injection/(row.work_time/24), 2)
-                    sets = ['oil', 'gas', 'water', 'injection', 'gor', 'wc', 'oil_cum', 'gas_cum', 'water_cum', 'injection_cum', 'work_time', 'work_time_cum']
+                    sets = ['oil', 'gas', 'water', 'injection', 'gor', 'wc', 'oil_cum', 'gas_cum', 'water_cum', 'injection_cum',
+                    'liquid_form', 'liquid_form_cum', 'gas_form', 'gas_form_cum', 'injection_form', 'injection_form_cum', 'work_time', 'work_time_cum']
                     for i in sets:
                         data[str(row_form.form)][str(row_pad.pad)][str(row.name)][str(true_date)][i]=getattr(row,i)
            

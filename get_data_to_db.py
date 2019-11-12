@@ -87,7 +87,8 @@ def save_bhp_pressures(well_id, date, bhp, form_pressure1, form_pressure2):
 и пластовое даление 
 """
 def save_month_rate(well_id, name, date, gor, wc,
-    oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum, work_time, work_time_cum):
+    oil, gas, water, injection, oil_cum, gas_cum, water_cum, injection_cum, liquid_form,
+    liquid_form_cum, gas_form, gas_form_cum, injection_form, injection_form_cum, work_time, work_time_cum):
     well_month_exists = session.query(WellMonthRates).filter_by(well_id = well_id, date = datetime.strptime(date, '%Y%m%d')).count()
     if not well_month_exists:
         well_date = WellMonthRates(
@@ -104,6 +105,12 @@ def save_month_rate(well_id, name, date, gor, wc,
         gas_cum=gas_cum,
         water_cum=water_cum,
         injection_cum=injection_cum,
+        liquid_form =liquid_form,
+        liquid_form_cum =liquid_form_cum,
+        gas_form = gas_form,
+        gas_form_cum = gas_form_cum,
+        injection_form = injection_form,
+        injection_form_cum = injection_form_cum,
         work_time=work_time, 
         work_time_cum=work_time_cum)
         session.add(well_date)
@@ -130,6 +137,12 @@ with open('ois\merfond.csv', 'r', encoding = 'utf-8-sig') as f:
             gas_cum=(float(line['G3_1'])+float(line['H3_1'])),
             water_cum=line['V3_1'],
             injection_cum=line['Z3_1'],
+            liquid_form =line['J1_1'],
+            liquid_form_cum =line['J3_1'],
+            gas_form =line['H1_1'],
+            gas_form_cum =line['H3_1'],
+            injection_form =line['X1_1'],
+            injection_form_cum =line['X3_1'],
             work_time=line['TR_1'],
             work_time_cum=line['TEKSR_1']
                    )      
